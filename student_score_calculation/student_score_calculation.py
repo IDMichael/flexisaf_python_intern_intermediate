@@ -1,61 +1,101 @@
-# Global configuration variable.
-# This variable is outside the function, so it is in the global scope
-# and can be accessed anywhere in the program.
-ACADEMY_NAME = "Bright Future Academy"
+# =========================================================
+# GLOBAL SCOPE VARIABLE
+# =========================================================
+ACADEMY_NAME = "Imami Awesome Academy"
 
-
-# Function to generate and display a student's performance report.
-# student_full_name      -> Normal positional parameter for the student's name.
-# *exam_scores           -> Accepts multiple exam scores as a tuple.
-# **grading_options      -> Accepts optional keyword settings as a dictionary.
+# =========================================================
+# FUNCTION: STUDENT REPORT GENERATOR
+# Requirements:
+# - Uses *args for scores
+# - Uses **kwargs for optional settings (weight, bonus)
+# - Handles unpacked inputs from main code
+# =========================================================
 def generate_student_report(student_full_name, *exam_scores, **grading_options):
 
-    # Validate that at least one score was provided.
-    # If no scores exist, raise an error to stop the program.
-    if not exam_scores:
+    # VALIDATE STUDENT NAME
+    if not isinstance(student_full_name, str):
+        raise TypeError("Student name must be a string.")
+
+    if not student_full_name.strip():
+        raise ValueError("Student name cannot be empty.")
+
+    # VALIDATE SCORES EXIST
+    if len(exam_scores) == 0:
         raise ValueError("At least one exam score is required.")
 
-    # Calculate the total score by summing all provided exam scores.
-    total_marks = sum(exam_scores)
+    # STRICT SCORE VALIDATION
+    cleaned_scores = []
 
-    # Retrieve the weight value from grading_options dictionary.
-    # If weight is not provided, default value becomes 1.0.
+    for score in exam_scores:
+
+        # Reject boolean (Python treats bool as int)
+        if isinstance(score, bool):
+            raise TypeError("Boolean values are not valid scores.")
+
+        # Must be numeric
+        if not isinstance(score, (int, float)):
+            raise TypeError("All exam scores must be numbers.")
+
+        # Reject NaN / Infinity
+        if isinstance(score, float):
+            if score != score or score in (float("inf"), float("-inf")):
+                raise ValueError("Invalid score value (NaN or Infinity not allowed).")
+
+        # Score range check
+        if score < 0 or score > 100:
+            raise ValueError("Scores must be between 0 and 100.")
+
+        cleaned_scores.append(score)
+
+    # COMPUTE TOTAL
+    total_marks = sum(cleaned_scores)
+
+    # EXTRACT GRADING SETTINGS (kwargs)
     weight = grading_options.get("weight", 1.0)
-
-    # Retrieve the bonus value from grading_options dictionary.
-    # If bonus is not provided, default value becomes 0.
     bonus = grading_options.get("bonus", 0)
 
-    # Apply the weight to the total marks.
+    # VALIDATE WEIGHT
+    if isinstance(weight, bool) or not isinstance(weight, (int, float)):
+        raise TypeError("Weight must be a number.")
+
+    if weight <= 0:
+        raise ValueError("Weight must be greater than 0.")
+
+    if isinstance(weight, float) and (weight != weight or weight in (float("inf"), float("-inf"))):
+        raise ValueError("Invalid weight value.")
+
+    # VALIDATE BONUS
+    if isinstance(bonus, bool) or not isinstance(bonus, (int, float)):
+        raise TypeError("Bonus must be a number.")
+
+    if bonus < 0:
+        raise ValueError("Bonus cannot be negative.")
+
+    if isinstance(bonus, float) and (bonus != bonus or bonus in (float("inf"), float("-inf"))):
+        raise ValueError("Invalid bonus value.")
+
+    # CALCULATIONS
     weighted_marks = total_marks * weight
-
-    # Add bonus marks to the weighted marks.
     final_marks = weighted_marks + bonus
+    average_marks = final_marks / len(cleaned_scores)
 
-    # Calculate the average score after weighting and bonus adjustments.
-    average_marks = final_marks / len(exam_scores)
-
-    # Determine the student's grade based on the average score.
+    # GRADE CALCULATION
     if average_marks >= 90:
         grade = "A"
-
     elif average_marks >= 80:
         grade = "B"
-
     elif average_marks >= 70:
         grade = "C"
-
     elif average_marks >= 60:
         grade = "D"
-
     else:
         grade = "F"
 
-    # Store all generated report details inside a dictionary.
+    # REPORT OUTPUT
     report = {
         "academy": ACADEMY_NAME,
         "student": student_full_name,
-        "scores": exam_scores,
+        "scores": tuple(cleaned_scores),
         "total_marks": total_marks,
         "weight": weight,
         "bonus": bonus,
@@ -64,36 +104,27 @@ def generate_student_report(student_full_name, *exam_scores, **grading_options):
         "grade": grade,
     }
 
-    # Display report heading.
     print("\n===== STUDENT PERFORMANCE REPORT =====")
-
-    # Loop through each key-value pair in the report dictionary
-    # and display them in a readable format.
     for key, value in report.items():
         print(f"{key.replace('_', ' ').title()}: {value}")
 
-    # Return the complete report dictionary.
     return report
 
-
-# Tuple containing multiple student exam scores.
-# This will later be unpacked into separate arguments using *.
+# MAIN PROGRAM (REQUIRED UNPACKING)
 student_exam_scores = (75, 80, 92, 88)
 
-
-# Dictionary containing optional grading settings.
-# This dictionary will later be unpacked using **.
 grading_configuration = {
     "weight": 1.2,
     "bonus": 5
 }
 
+# SAFE EXECUTION BLOCK
+try:
+    generate_student_report(
+        "Michael Ukana",
+        *student_exam_scores,
+        **grading_configuration
+    )
 
-# Function call using unpacking.
-# *student_exam_scores   -> Unpacks tuple values into separate score arguments.
-# **grading_configuration -> Unpacks dictionary items into keyword arguments.
-generate_student_report(
-    "Michael Ukana",
-    *student_exam_scores,
-    **grading_configuration
-)
+except (ValueError, TypeError) as error:
+    print(f"\nError: {error}")
