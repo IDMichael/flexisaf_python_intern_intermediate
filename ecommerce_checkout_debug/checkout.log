@@ -1,0 +1,4 @@
+2026-06-05 04:40:33,679 - INFO - Cart total calculated: 1150
+2026-06-05 04:40:33,680 - INFO - Total before discount: 1150
+2026-06-05 04:42:17,035 - INFO - Discount calculated (BUGGED): 11500
+2026-06-05 04:42:17,035 - INFO - Final total after discount: -10350
