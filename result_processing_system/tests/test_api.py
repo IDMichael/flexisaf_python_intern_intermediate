@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from app.database.connection import create_connection
 
 from app.main import app
 
@@ -34,6 +35,37 @@ def test_create_student():
 
     assert data["student_number"] == "API-STU-001"
     assert data["name"] == "API Student"
+
+    connection = create_connection()
+
+    print(
+        "STUDENTS BEFORE:",
+        connection.execute(
+            """
+            SELECT
+                id,
+                user_id,
+                student_number,
+                email
+            FROM students
+            """
+        ).fetchall()
+    )
+
+    print(
+        "USERS BEFORE:",
+        connection.execute(
+            """
+            SELECT
+                id,
+                username,
+                role
+            FROM users
+            """
+        ).fetchall()
+    )
+
+    connection.close()
 
 
 def test_create_course():

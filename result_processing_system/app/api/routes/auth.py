@@ -1,3 +1,17 @@
+from app.core.exceptions import (
+    DatabaseError,
+    DuplicateResourceError,
+)
+
+from app.schemas.registration import (
+    StudentRegistrationRequest,
+    StudentRegistrationResponse,
+)
+
+from app.services.registration_service import (
+    register_student,
+)
+
 from datetime import timedelta
 
 from fastapi import (
@@ -28,7 +42,39 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
+@router.post(
+    "/register",
+    response_model=StudentRegistrationResponse,
+    status_code=201,
+)
+def register(
+    registration: StudentRegistrationRequest,
+):
+    """Register a new student account and profile."""
 
+    try:
+        return register_student(
+            username=registration.username,
+            password=registration.password,
+            student_number=registration.student_number,
+            name=registration.name,
+            email=str(registration.email),
+            department=registration.department,
+            level=registration.level,
+        )
+
+    except DuplicateResourceError as error:
+        raise HTTPException(
+            status_code=409,
+            detail=str(error),
+        ) from error
+
+    except DatabaseError as error:
+        raise HTTPException(
+            status_code=500,
+            detail=str(error),
+        ) from error
+    
 @router.post(
     "/login",
     response_model=TokenResponse,

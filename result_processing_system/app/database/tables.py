@@ -50,73 +50,90 @@ def create_tables():
         # Create students table.
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS students (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            student_number TEXT NOT NULL UNIQUE,
-            name TEXT NOT NULL,
-            email TEXT UNIQUE,
-            department TEXT NOT NULL,
-            level INTEGER NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            CHECK (length(trim(name)) > 0),
-            CHECK (length(trim(student_number)) > 0),
-            CHECK (level > 0)
+                user_id INTEGER UNIQUE,
+
+                student_number TEXT NOT NULL UNIQUE,
+
+                name TEXT NOT NULL,
+
+                email TEXT UNIQUE,
+
+                department TEXT NOT NULL,
+
+                level INTEGER NOT NULL,
+
+                created_at TIMESTAMP
+                    DEFAULT CURRENT_TIMESTAMP,
+
+                updated_at TIMESTAMP
+                    DEFAULT CURRENT_TIMESTAMP,
+
+                CHECK (length(trim(name)) > 0),
+
+                CHECK (length(trim(student_number)) > 0),
+
+                CHECK (level > 0),
+
+                FOREIGN KEY (user_id)
+                    REFERENCES users(id)
+                    ON DELETE CASCADE
             )
         """)
 
         #  Create courses table.
         cursor.execute("""
-        CREATE TABLE IF NOT EXISTS courses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        course_name TEXT NOT NULL,
-        course_code TEXT NOT NULL UNIQUE,
-        credit_unit INTEGER NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        
-        CHECK (length(trim(course_code)) > 0),
-        CHECK (length(trim(course_name)) > 0),
-        CHECK (credit_unit > 0)
-        )
-        """)
+            CREATE TABLE IF NOT EXISTS courses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            course_name TEXT NOT NULL,
+            course_code TEXT NOT NULL UNIQUE,
+            credit_unit INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            
+            CHECK (length(trim(course_code)) > 0),
+            CHECK (length(trim(course_name)) > 0),
+            CHECK (credit_unit > 0)
+            )
+            """)
 
         # Create results table.
         cursor.execute("""
-        CREATE TABLE IF NOT EXISTS results (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+            CREATE TABLE IF NOT EXISTS results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-        student_id INTEGER NOT NULL,
-        course_id INTEGER NOT NULL,
+            student_id INTEGER NOT NULL,
+            course_id INTEGER NOT NULL,
 
-        score REAL NOT NULL,
+            score REAL NOT NULL,
 
-        semester TEXT NOT NULL,
-        session TEXT NOT NULL,
-        
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            semester TEXT NOT NULL,
+            session TEXT NOT NULL,
+            
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-        FOREIGN KEY (student_id)
-            REFERENCES students(id)
-            ON DELETE CASCADE,
+            FOREIGN KEY (student_id)
+                REFERENCES students(id)
+                ON DELETE CASCADE,
 
-        FOREIGN KEY (course_id)
-            REFERENCES courses(id)
-            ON DELETE CASCADE,
+            FOREIGN KEY (course_id)
+                REFERENCES courses(id)
+                ON DELETE CASCADE,
 
-        CHECK (score >= 0 AND score <= 100),
-        CHECK (length(trim(semester)) > 0),
-        CHECK (length(trim(session)) > 0),
+            CHECK (score >= 0 AND score <= 100),
+            CHECK (length(trim(semester)) > 0),
+            CHECK (length(trim(session)) > 0),
 
-        unique(
-            student_id,
-            course_id,
-            semester,
-            session
+            unique(
+                student_id,
+                course_id,
+                semester,
+                session
+                )
             )
-        )
-        """)
+            """)
 
         # Create indexes for frequently searched columns.\
         cursor.execute("""
@@ -137,6 +154,12 @@ def create_tables():
         cursor.execute("""
             CREATE INDEX IF NOT EXISTS idx_results_session
             ON results(session)
+        """)
+
+        cursor.execute("""
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_students_user_id
+            ON students(user_id)
+            WHERE user_id IS NOT NULL
         """)
 
         connection.commit()
