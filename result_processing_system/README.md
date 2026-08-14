@@ -507,8 +507,8 @@ This project is organized around the required submission areas:
 
 Replace the repository placeholder before submitting.
 
-- **GitHub Repository:** `<YOUR_GITHUB_REPOSITORY_URL>`
-- **Presentation PDF:** `Result_Processing_System_Presentation.pdf`
+- **GitHub Repository:** (https://github.com/IDMichael/flexisaf_python_intern_intermediate/tree/main/result_processing_system)
+- **Presentation PDF:** `Result_Processing_System_Presentation.pdf`, Link: https://acrobat.adobe.com/id/urn:aaid:sc:EU:055e79ec-7ca6-4a74-a3df-f812ce01ca06
 - **Screenshots Folder:** `screenshots/`
 - **Swagger Documentation:** `http://127.0.0.1:8000/docs` (local development)
 
