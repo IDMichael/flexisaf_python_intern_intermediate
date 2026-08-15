@@ -492,13 +492,13 @@ Presentation files:
 
 This project is organized around the required submission areas:
 
-- [x] Working backend API
-- [x] Source code
-- [x] README documentation
-- [x] SQLite data handling
-- [x] Core logic explanation
-- [x] API/analytics output examples
-- [x] Presentation slides
+- [] Working backend API
+- [] Source code
+- [] README documentation
+- [] SQLite data handling
+- [] Core logic explanation
+- [] API/analytics output examples
+- [] Presentation slides
 - [ ] Add final GitHub repository URL
 - [ ] Add actual screenshots to `screenshots/`
 - [ ] Confirm the final presentation PDF is linked in the GitHub README
