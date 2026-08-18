@@ -124,7 +124,7 @@ def test_registered_student_can_login():
 
         login_response = client.post(
             "/auth/login",
-            json={
+            data={
                 "username": username,
                 "password": password,
             },
@@ -520,7 +520,7 @@ def test_successful_login():
 
         response = client.post(
             "/auth/login",
-            json={
+            data={
                 "username": username,
                 "password": password,
             },
@@ -555,7 +555,7 @@ def test_wrong_password_is_rejected():
 
         response = client.post(
             "/auth/login",
-            json={
+            data={
                 "username": username,
                 "password": "WrongPassword123!",
             },
@@ -579,7 +579,7 @@ def test_nonexistent_user_is_rejected():
 
     response = client.post(
         "/auth/login",
-        json={
+        data={
             "username": "user_that_does_not_exist",
             "password": "Password123!",
         },
@@ -618,7 +618,7 @@ def test_valid_token_allows_access():
 
         login_response = client.post(
             "/auth/login",
-            json={
+            data={
                 "username": username,
                 "password": "Password123!",
             },

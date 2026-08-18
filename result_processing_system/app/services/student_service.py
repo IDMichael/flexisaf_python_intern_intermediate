@@ -161,6 +161,42 @@ def update_student(
                 "Student"
             )
 
+        # Check whether another student already uses
+        # the submitted student number.
+        cursor.execute(
+            """
+            SELECT id
+            FROM students
+            WHERE student_number = ?
+            AND id != ?
+            """,
+            (student_number, student_id),
+        )
+
+        if cursor.fetchone() is not None:
+            raise DuplicateResourceError(
+                "Student"
+            )
+
+        # Check whether another student already exists
+        # the submitted email.
+        if email is not None:
+            cursor.execute(
+                """
+                SELECT id
+                FROM students
+                WHERE email = ?
+                AND id != ?
+                """,
+                (email, student_id),
+            )  
+
+        if cursor.fetchone() is not None:
+            raise DuplicateResourceError(
+                "Student"
+            )
+
+        # Update the student.
         cursor.execute(
             """
             UPDATE students
@@ -185,6 +221,7 @@ def update_student(
 
         connection.commit()
 
+        # Retrieve the updated student. 
         cursor.execute(
             """
             SELECT
@@ -206,8 +243,9 @@ def update_student(
         connection.rollback()
         raise
 
-    except sqlite3.IntegrityError as error:
+    except DuplicateResourceError:
         connection.rollback()
+        raise
 
         raise DuplicateResourceError(
             "Student"

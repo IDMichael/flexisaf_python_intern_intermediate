@@ -16,8 +16,8 @@ from datetime import timedelta
 
 from fastapi import (
     APIRouter,
+    Depends,
     HTTPException,
-    Request,
 )
 
 from app.database.connection import create_connection
@@ -32,10 +32,10 @@ from app.core.security import (
 )
 
 from app.schemas.auth import (
-    LoginRequest,
     TokenResponse,
 )
 
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(
     prefix="/auth",
@@ -74,67 +74,22 @@ def register(
             status_code=500,
             detail=str(error),
         ) from error
+
     
 @router.post(
     "/login",
     response_model=TokenResponse,
 )
-async def login(request: Request):
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
     """
     Authenticate a user and return
     a JWT access token.
-
-    Supports both:
-    - JSON requests
-    - OAuth2 form requests from Swagger UI
     """
 
-    content_type = request.headers.get(
-        "content-type",
-        ""
-    )
-
-    # -----------------------------------------------------
-    # Read login credentials
-    # -----------------------------------------------------
-
-    if "application/json" in content_type:
-
-        body = await request.json()
-
-        data = LoginRequest.model_validate(
-            body
-        )
-
-        username = data.username
-        password = data.password
-
-    else:
-
-        form = await request.form()
-
-        username = form.get("username")
-        password = form.get("password")
-
-        if not isinstance(username, str):
-            raise HTTPException(
-                status_code=422,
-                detail="Username is required.",
-            )
-
-        if not isinstance(password, str):
-            raise HTTPException(
-                status_code=422,
-                detail="Password is required.",
-            )
-
-        data = LoginRequest(
-            username=username,
-            password=password,
-        )
-
-        username = data.username
-        password = data.password
+    username = form_data.username
+    password = form_data.password
 
     # -----------------------------------------------------
     # Connect to database
